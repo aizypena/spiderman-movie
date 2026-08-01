@@ -187,7 +187,6 @@ export default function Home() {
         {/* HUD Bottom Bar */}
         <div className="mt-6 sm:mt-8 pt-3 sm:pt-4 w-full border-t border-zinc-800 flex justify-between items-center text-[9px] sm:text-[10px] text-zinc-500 uppercase tracking-wider sm:tracking-widest">
           <span>COIN: 99</span>
-          <span className="hidden sm:inline">SYSTEM: NEXT.JS</span>
           <span>STATUS: ONLINE</span>
         </div>
       </main>
