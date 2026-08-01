@@ -3,7 +3,15 @@
 import { useState } from "react";
 
 export default function Home() {
-  const [accepted, setAccepted] = useState(false);
+  const [gameState, setGameState] = useState<"NAME_ENTRY" | "MISSION" | "ACCEPTED">("NAME_ENTRY");
+  const [playerName, setPlayerName] = useState("");
+
+  const handleStartGame = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (playerName.trim()) {
+      setGameState("MISSION");
+    }
+  };
 
   return (
     <div className="flex min-h-screen w-full flex-col items-center justify-center bg-black font-mono text-zinc-100 p-3 sm:p-6 md:p-10 relative select-none overflow-hidden">
@@ -33,14 +41,54 @@ export default function Home() {
             CO-OP QUEST
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <span>P2: NICOLE</span>
+            <span>P2: {playerName.trim() ? playerName.toUpperCase() : "PLAYER 2"}</span>
           </div>
         </div>
 
-        {!accepted ? (
+        {/* STAGE 1: NAME ENTRY SCREEN */}
+        {gameState === "NAME_ENTRY" && (
+          <div className="flex flex-col items-center text-center w-full my-auto py-4 sm:py-6">
+            <span className="inline-block bg-yellow-500 text-black px-2.5 py-0.5 text-[10px] sm:text-xs font-black tracking-widest uppercase mb-4">
+              [ CHARACTER SELECT ]
+            </span>
+
+            <h1 className="text-xl sm:text-3xl font-extrabold text-white uppercase tracking-tight mb-2">
+              ENTER PLAYER 2 NAME
+            </h1>
+
+            <p className="text-xs sm:text-sm text-zinc-400 mb-6 max-w-sm">
+              Insert name to join co-op lobby for Spider-Man: Brand New Day.
+            </p>
+
+            <form onSubmit={handleStartGame} className="flex flex-col gap-4 w-full max-w-sm">
+              <div className="relative w-full">
+                <input
+                  type="text"
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                  placeholder="ENTER NAME..."
+                  maxLength={12}
+                  required
+                  className="w-full bg-zinc-900 border-2 border-red-500 text-center font-bold text-lg sm:text-xl text-yellow-400 py-3 px-4 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 tracking-wider uppercase placeholder:text-zinc-600"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={!playerName.trim()}
+                className="group relative flex h-12 sm:h-14 w-full items-center justify-center border-2 border-red-500 bg-red-600 font-bold text-white text-sm sm:text-base tracking-widest uppercase transition-all hover:bg-red-500 active:translate-y-0.5 shadow-[0_0_15px_rgba(220,38,38,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-red-600"
+              >
+                PRESS START 🎮
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* STAGE 2: MISSION DETAILS SCREEN */}
+        {gameState === "MISSION" && (
           <>
             {/* Quest Header */}
-            <div className="text-center space-y-1.5 sm:space-y-2 mb-4 sm:mb-6 w-full">
+            <div className="text-center space-y-1.5 sm:space-y-2 mb-4 sm:mb-6 w-full animate-fade-in">
               <span className="inline-block bg-red-600 text-black px-2.5 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-black tracking-wider sm:tracking-widest uppercase">
                 [ MAIN QUEST UNLOCKED ]
               </span>
@@ -57,7 +105,7 @@ export default function Home() {
               </div>
               
               <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-                <span className="text-red-400 font-bold">&gt;</span> OBJECTIVE: Escort Player 2 (Nicole) to the theater, secure popcorn & snacks, watch Spidey defeat the bad guys.
+                <span className="text-red-400 font-bold">&gt;</span> OBJECTIVE: Escort Player 2 ({playerName}) to the theater, secure popcorn & snacks, watch Spidey defeat the bad guys.
               </p>
 
               {/* Schedule Info Box */}
@@ -80,13 +128,13 @@ export default function Home() {
 
             {/* Action Prompt */}
             <p className="text-xs sm:text-base text-zinc-300 mb-5 sm:mb-8 text-center animate-bounce font-bold tracking-wide">
-              ACCEPT THIS MISSION, NICOLE?
+              ACCEPT THIS MISSION, {playerName.toUpperCase()}?
             </p>
 
             {/* Game Options / Select Buttons */}
             <div className="flex flex-col gap-3 sm:gap-4 w-full">
               <button
-                onClick={() => setAccepted(true)}
+                onClick={() => setGameState("ACCEPTED")}
                 className="group relative flex min-h-[48px] sm:min-h-[56px] w-full items-center justify-between border-2 border-red-500 bg-red-950/40 px-4 sm:px-6 font-bold text-red-400 text-xs sm:text-sm md:text-base transition-all duration-150 hover:bg-red-600 hover:text-white active:translate-y-0.5"
               >
                 <span className="flex items-center gap-2 sm:gap-3 text-left">
@@ -97,7 +145,7 @@ export default function Home() {
               </button>
 
               <button
-                onClick={() => setAccepted(true)}
+                onClick={() => setGameState("ACCEPTED")}
                 className="group relative flex min-h-[48px] sm:min-h-[56px] w-full items-center justify-between border-2 border-blue-500 bg-blue-950/40 px-4 sm:px-6 font-bold text-blue-400 text-xs sm:text-sm md:text-base transition-all duration-150 hover:bg-blue-600 hover:text-white active:translate-y-0.5"
               >
                 <span className="flex items-center gap-2 sm:gap-3 text-left">
@@ -108,8 +156,10 @@ export default function Home() {
               </button>
             </div>
           </>
-        ) : (
-          /* Game Start / Success Screen */
+        )}
+
+        {/* STAGE 3: SUCCESS SCREEN */}
+        {gameState === "ACCEPTED" && (
           <div className="flex flex-col items-center text-center py-4 sm:py-8 space-y-3 sm:space-y-4 w-full">
             <div className="text-[10px] sm:text-xs text-yellow-400 tracking-wider sm:tracking-widest uppercase bg-yellow-950/60 border border-yellow-500/50 px-2.5 py-1">
               *** MISSION ACCEPTED ***
@@ -120,7 +170,7 @@ export default function Home() {
             </h2>
             
             <div className="text-xs sm:text-base text-zinc-300 max-w-md border-t border-b border-zinc-800 py-4 my-1 sm:my-2 space-y-2 w-full">
-              <p>Player 2 has joined the party!</p>
+              <p><span className="text-yellow-400 font-bold">{playerName}</span> has joined the party!</p>
               <div className="text-yellow-400 font-bold bg-zinc-900 border border-yellow-500/30 p-3 rounded text-left text-xs sm:text-sm">
                 <p>📍 Location: SM Sto. Tomas Cinema</p>
                 <p>🕒 Time: Tomorrow @ 1:45 PM</p>
@@ -137,6 +187,7 @@ export default function Home() {
         {/* HUD Bottom Bar */}
         <div className="mt-6 sm:mt-8 pt-3 sm:pt-4 w-full border-t border-zinc-800 flex justify-between items-center text-[9px] sm:text-[10px] text-zinc-500 uppercase tracking-wider sm:tracking-widest">
           <span>COIN: 99</span>
+          <span className="hidden sm:inline">SYSTEM: NEXT.JS</span>
           <span>STATUS: ONLINE</span>
         </div>
       </main>
